@@ -1,147 +1,267 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-width=1.0">
-    <meta name="description" content="Grupo Marbe Poliuretano e SB Borrachas - Soluções em revestimento a quente, rolos, tambores e peças de alta performance em PU e borracha.">
-    <meta name="keywords" content="revestimento de rolos, poliuretano de fundição, tambores industriais, peças prensadas em borracha, vulcanização a quente, Ribeirão Preto, Ebonite, Viton, EPDM">
-    <title>Engenharia em Revestimentos e Peças Industriais | Grupo Marbe & SB Borrachas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo Marbe & SB Borrachas | Engenharia de Alta Performance</title>
     
-    <!-- Fonte Moderna e Industrial -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Schema.org Otimizado -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Manufacturer",
-      "name": "Grupo Marbe Poliuretano e SB Borrachas",
-      "telephone": "+551625250294",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Rua São Carlo, 84 - Vila Mariana",
-        "addressLocality": "Ribeirão Preto",
-        "addressRegion": "SP",
-        "addressCountry": "BR"
-      },
-      "areaServed": "Brazil",
-      "description": "Indústria especializada em revestimento de rolos e tambores, e fabricação de peças em borracha e poliuretano de alta performance."
-    }
+    <!-- Tailwind CSS (Framework Moderno) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#050505',
+                            dark: '#0f1115',
+                            gray: '#1e2028',
+                            orange: '#FF5A00',
+                            orangeHover: '#E04F00'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
     </script>
-</head>
-<body>
 
-    <!-- Header / Nav -->
-    <nav class="navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <strong>GRUPO MARBE</strong> & SB BORRACHAS
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        /* Grid Background Pattern */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+        }
+        /* Glassmorphism */
+        .glass {
+            background: rgba(15, 17, 21, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 32, 40, 0.4) 0%, rgba(15, 17, 21, 0.8) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 90, 0, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(255, 90, 0, 0.15);
+            transform: translateY(-5px);
+        }
+        /* Glows */
+        .text-glow {
+            text-shadow: 0 0 40px rgba(255, 90, 0, 0.5);
+        }
+        .btn-glow {
+            box-shadow: 0 0 20px rgba(255, 90, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 35px rgba(255, 90, 0, 0.5);
+            transform: scale(1.02);
+        }
+        /* Accent Blob */
+        .blob {
+            position: absolute;
+            background: #FF5A00;
+            filter: blur(150px);
+            opacity: 0.12;
+            z-index: -1;
+            border-radius: 50%;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #1e2028; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF5A00; }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-orange selection:text-white relative">
+
+    <!-- Ambient Background Blobs -->
+    <div class="blob w-[600px] h-[600px] top-[-200px] left-[-200px]"></div>
+    <div class="blob w-[500px] h-[500px] bottom-[10%] right-[-100px] opacity-10"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b-0 border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-hexagon text-brand-orange text-3xl"></i>
+                <div class="leading-tight">
+                    <span class="font-display font-bold text-lg tracking-wide block">GRUPO MARBE</span>
+                    <span class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">& SB Borrachas</span>
+                </div>
             </div>
-            <div class="nav-contact">
-                <span>Engenharia em Elastômeros</span>
-            </div>
+            <a href="https://wa.me/551625250294" target="_blank" class="hidden md:flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-2.5 rounded-full text-sm font-medium transition-all">
+                <i class="ph-fill ph-whatsapp-logo text-brand-orange text-lg"></i>
+                (16) 2525-0294
+            </a>
         </div>
     </nav>
 
-    <!-- Hero Section de Alto Impacto -->
-    <header class="hero">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <span class="badge">Atendimento Industrial Especializado</span>
-            <h1>Revestimentos e Peças de <span class="highlight">Alta Performance</span></h1>
-            <p>Especialistas em vulcanização a quente e fundição de Poliuretano. Maximizamos a vida útil dos seus rolos, tambores e componentes mecânicos para que a sua linha de produção nunca pare.</p>
-            <div class="hero-actions">
-                <a href="https://wa.me/551625250294?text=Ol%C3%A1%2C%20preciso%20de%20um%20or%C3%A7amento%20industrial." class="btn btn-primary" target="_blank">
-                    Solicitar Orçamento Técnico
-                </a>
-                <a href="#solucoes" class="btn btn-secondary">Ver Soluções</a>
+    <!-- Hero Section -->
+    <section class="relative min-h-[100svh] flex items-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 bg-grid -z-10"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 w-full relative z-10">
+            <div class="max-w-4xl mx-auto text-center gs-reveal">
+                
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 border border-brand-orange/20">
+                    <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+                    <span class="text-sm font-medium text-gray-300">Engenharia de Elastômeros • Ribeirão Preto</span>
+                </div>
+                
+                <h1 class="font-display text-5xl md:text-7xl lg:text-[5rem] font-bold tracking-tighter mb-6 leading-[1.1]">
+                    Máxima Resistência.<br>
+                    <span class="text-brand-orange text-glow">Zero Paradas.</span>
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Especialistas em revestimento a quente de rolos e tambores. Fabricação técnica sob medida em Poliuretano (PU) e diversos elastômeros para suportar as condições mais extremas.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="https://wa.me/551625250294?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20um%20engenheiro%20sobre%20revestimentos%20e%20pe%C3%A7as." target="_blank" class="w-full sm:w-auto px-8 py-4 bg-brand-orange hover:bg-brand-orangeHover text-white rounded-xl font-semibold flex items-center justify-center gap-2 btn-glow">
+                        <i class="ph-bold ph-whatsapp-logo text-xl"></i>
+                        Falar com Especialista
+                    </a>
+                    <a href="#solucoes" class="w-full sm:w-auto px-8 py-4 glass hover:bg-white/10 rounded-xl font-semibold transition-all">
+                        Explorar Soluções
+                    </a>
+                </div>
             </div>
         </div>
-    </header>
+    </section>
 
-    <!-- Seção de Especialidades Técnicas (Grid Moderno) -->
-    <main>
-        <section id="solucoes" class="features container">
-            <div class="section-title">
-                <h2>Nossas Especialidades</h2>
-                <p>Processos rigorosos e matérias-primas de ponta para ambientes extremos.</p>
-                <div class="divider"></div>
+    <!-- Seção Detalhada de Materiais e Peças -->
+    <section id="solucoes" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-16 gs-reveal text-center">
+                <h2 class="font-display text-3xl md:text-5xl font-bold mb-4 tracking-tight">Engenharia de <span class="text-brand-orange">Elastômeros</span></h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">Desenvolvemos soluções sob medida com os melhores compostos do mercado, garantindo resistência química, térmica e mecânica.</p>
             </div>
 
-            <div class="feature-grid">
-                <!-- Card 1 -->
-                <div class="feature-card">
-                    <div class="card-icon">⚙️</div>
-                    <h3>Revestimento de Rolos e Tambores</h3>
-                    <p>Processos de vulcanização a quente que garantem total aderência ao núcleo metálico, oferecendo resistência superior à abrasão e impactos na sua esteira ou linha.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna de Processos -->
+                <div class="glass-card rounded-3xl p-8 gs-reveal">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="ph-fill ph-gear-six text-brand-orange"></i> Processos Industriais
+                    </h3>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex gap-3"><i class="ph-bold ph-check text-brand-orange"></i> Revestimento a quente de rolos e tambores (Vulcanização)</li>
+                        <li class="flex gap-3"><i class="ph-bold ph-check text-brand-orange"></i> Fundição de Poliuretano (PU) de alta performance</li>
+                        <li class="flex gap-3"><i class="ph-bold ph-check text-brand-orange"></i> Fabricação completa: Usinagem e balanceamento de núcleos</li>
+                        <li class="flex gap-3"><i class="ph-bold ph-check text-brand-orange"></i> Peças prensadas sob medida para manutenção industrial</li>
+                    </ul>
                 </div>
-                <!-- Card 2 -->
-                <div class="feature-card">
-                    <div class="card-icon">🧪</div>
-                    <h3>Poliuretano (PU) Derramado</h3>
-                    <p>Peças e revestimentos em poliuretano de fundição projetados para suportar altas cargas mecânicas, cortes e desgaste agressivo contínuo.</p>
-                </div>
-                <!-- Card 3 -->
-                <div class="feature-card">
-                    <div class="card-icon">🔧</div>
-                    <h3>Peças Prensadas Técnicas</h3>
-                    <p>Fabricação sob medida em diversos elastômeros. Desenvolvemos o composto exato para a sua necessidade, seja Ebonite, Viton, EPDM ou borrachas naturais.</p>
-                </div>
-            </div>
-        </section>
 
-        <!-- Seção de Autoridade (Dados e Fatos) -->
-        <section class="authority-banner">
-            <div class="container authority-content">
-                <h2>Por que a Indústria confia no Grupo Marbe?</h2>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <h4>Durabilidade</h4>
-                        <p>Matéria-prima de alta exigência</p>
-                    </div>
-                    <div class="stat-item">
-                        <h4>Precisão</h4>
-                        <p>Atendimento às tolerâncias de espessura</p>
-                    </div>
-                    <div class="stat-item">
-                        <h4>Logística</h4>
-                        <p>Atuação rápida a partir de Ribeirão Preto</p>
+                <!-- Coluna de Materiais -->
+                <div class="glass-card rounded-3xl p-8 gs-reveal">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="ph-fill ph-flask text-brand-orange"></i> Materiais Técnicos
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-400">
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ EPDM</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Viton (FKM)</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Nitrílica (NBR)</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ SBR</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Neoprene</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Silicone</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Ebonite</span>
+                        <span class="bg-white/5 px-3 py-2 rounded-lg border border-white/5 hover:border-brand-orange/50 transition-all">✓ Poliuretano (PU)</span>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- CTA Final com Urgência -->
-        <section class="final-cta container">
-            <div class="cta-box">
-                <h2>Evite paradas desnecessárias na sua produção.</h2>
-                <p>Nossa equipe técnica está pronta para analisar seu projeto e indicar o melhor composto e processo de cura para as suas peças.</p>
-                <a href="https://wa.me/551625250294" class="btn btn-primary btn-large" target="_blank">
-                    Falar com um Especialista no WhatsApp
-                </a>
-                <p class="cta-subtext">Ou ligue: (16) 2525-0294 | (16) 2525-0701</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer Industrial -->
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div class="footer-info">
-                <h3>Grupo Marbe & SB Borrachas</h3>
-                <p>Soluções definitivas em revestimentos de borracha, PU e fabricação de peças prensadas.</p>
-            </div>
-            <div class="footer-contact">
-                <h4>Fábrica e Atendimento</h4>
-                <p>📍 Rua São Carlo, 84 - Vila Mariana, Ribeirão Preto - SP</p>
-                <p>📞 (16) 2525-0294 | (16) 2525-0701</p>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Grupo Marbe Poliuretano e SB Borrachas. Todos os direitos reservados.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-[#020202] pt-20 pb-10 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-2 mb-6">
+                        <i class="ph-fill ph-hexagon text-brand-orange text-3xl"></i>
+                        <span class="font-display font-bold text-2xl tracking-tight">GRUPO MARBE</span>
+                    </div>
+                    <p class="text-gray-400 max-w-sm mb-8 leading-relaxed">Inovação e resistência extrema em revestimentos industriais de borracha e poliuretano.</p>
+                    <a href="https://wa.me/551625250294" target="_blank" class="inline-flex items-center gap-2 text-brand-orange font-medium hover:text-white transition-colors">
+                        Iniciar Atendimento <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div>
+                    <h4 class="font-display font-bold mb-6 text-white tracking-wide uppercase text-sm">Comercial</h4>
+                    <ul class="space-y-4 text-gray-400 text-sm">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-phone text-brand-orange text-xl"></i> (16) 2525-0294</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-phone text-brand-orange text-xl"></i> (16) 2525-0701</li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-whatsapp-logo text-brand-orange text-xl"></i> WhatsApp Rápido</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-display font-bold mb-6 text-white tracking-wide uppercase text-sm">Logística & Fábrica</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed flex items-start gap-3">
+                        <i class="ph-fill ph-map-pin text-brand-orange text-xl shrink-0 mt-0.5"></i>
+                        Rua São Carlo, 84<br>
+                        Vila Mariana<br>
+                        Ribeirão Preto - SP
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium tracking-wide">
+                <p>&copy; 2026 Grupo Marbe & SB Borrachas.</p>
+                <p>Projetado para Alta Conversão Industrial</p>
+            </div>
         </div>
     </footer>
 
+    <!-- GSAP Initialization -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        
+        const revealElements = document.querySelectorAll('.gs-reveal');
+        revealElements.forEach((el, i) => {
+            gsap.fromTo(el, 
+                { y: 40, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+    </script>
 </body>
 </html>
