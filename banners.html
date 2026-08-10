@@ -3,286 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Banner - Estilo Canva</title>
-    <!-- Importando a biblioteca Fabric.js (O "motor" do Canva) -->
+    <title>Sistema de Geração de Banners</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e9ecef;
-            display: flex;
-            gap: 20px;
-            padding: 20px;
-            margin: 0;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        /* PAINEL DE CONTROLES (Esquerda) */
-        .controles {
-            width: 320px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .controles h3 { margin-top: 0; color: #333; }
-        .controles label { font-weight: bold; font-size: 13px; color: #555; }
+        body { font-family: Arial, sans-serif; background-color: #e9ecef; display: flex; gap: 20px; padding: 20px; margin: 0; height: 100vh; box-sizing: border-box; }
         
-        .controles select, .controles input[type="file"] {
-            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-        }
-
-        .linha-cores {
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .btn-acao {
-            background-color: #0b1325; color: white; border: none; padding: 10px;
-            font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; text-align: center;
-        }
+        .painel { width: 320px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .painel h3 { margin: 0; color: #0b1325; font-size: 18px; border-bottom: 2px solid #ff5722; padding-bottom: 5px; }
+        .painel label { font-weight: bold; font-size: 12px; color: #555; }
+        
+        .box-config { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px dashed #ccc; margin-bottom: 10px; }
+        
+        input[type="file"], select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; margin-top: 5px; }
+        
+        .btn-acao { background-color: #0b1325; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; font-size: 13px; width: 100%; margin-top: 5px; }
         .btn-acao:hover { background-color: #1a2a4f; }
-
-        .btn-gerar {
-            background-color: #ff5722; color: white; border: none; padding: 12px;
-            font-weight: bold; font-size: 16px; cursor: pointer; border-radius: 4px; margin-top: 10px;
-        }
-        .btn-gerar:hover { background-color: #e64a19; }
-
-        /* ÁREA DE EDIÇÃO (Direita) */
-        .area-canvas {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow: auto;
-            background-color: #d1d5db;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        /* Bordinha para mostrar onde o canvas acaba */
-        .canvas-container {
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
         
-        .instrucao {
-            font-size: 12px; color: #666; text-align: center; margin-bottom: 10px;
-        }
+        .btn-template { background-color: #ff5722; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; width: 100%; }
+        .btn-template:hover { background-color: #e64a19; }
+
+        .area-canvas { flex-grow: 1; display: flex; justify-content: center; align-items: flex-start; overflow: auto; background-color: #d1d5db; padding: 20px; border-radius: 8px; }
+        .canvas-container { box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <!-- Painel de Controles -->
-    <div class="controles">
-        <h3>Painel de Edição</h3>
-        <p class="instrucao">Dê 2 cliques num texto na imagem para editá-lo. Clique e arraste para mover.</p>
+    <!-- PAINEL LATERAL -->
+    <div class="painel">
+        
+        <!-- TELA 1: CONFIGURAÇÕES GLOBAIS -->
+        <h3>⚙️ Tela 1: Configuração Padrão</h3>
+        <div class="box-config">
+            <label>Salvar Logo na Memória do Sistema:</label>
+            <input type="file" accept="image/*" id="input-logo-padrao" onchange="salvarLogoNaMemoria(event)">
+            <p style="font-size: 10px; color: #666; margin: 5px 0 0 0;">Suba uma vez. Ela ficará salva para os próximos acessos.</p>
+        </div>
+
+        <!-- TELA 2: OPERAÇÃO DIÁRIA -->
+        <h3>🎨 Tela 2: Operação (Banner)</h3>
         
         <div>
-            <label>Formato para Rede Social:</label>
+            <label>Formato:</label>
             <select id="sel-formato" onchange="mudarFormato()">
-                <option value="feed">Feed Instagram (Quadrado)</option>
-                <option value="stories">Stories Instagram (Vertical)</option>
+                <option value="stories">Stories (1080x1920)</option>
+                <option value="feed">Feed (1080x1080)</option>
             </select>
         </div>
 
-        <hr style="width:100%; border:0; border-top:1px solid #eee;">
-
-        <div class="linha-cores">
-            <label>Cor do Fundo:</label>
-            <input type="color" id="cor-fundo" value="#0b1325" onchange="mudarCorFundo()">
-        </div>
-
-        <div class="linha-cores">
-            <label>Cor do Item Selecionado:</label>
-            <input type="color" id="cor-item" value="#ffffff" onchange="mudarCorElemento()">
-        </div>
-
-        <hr style="width:100%; border:0; border-top:1px solid #eee;">
-
         <div>
-            <label>1. Fundo (Foto do Produto):</label>
+            <label>1. Subir Foto do Produto (Fundo):</label>
             <input type="file" accept="image/*" onchange="adicionarImagemFundo(event)">
         </div>
 
-        <div>
-            <label>2. Sua Logo (Com fundo transparente):</label>
-            <input type="file" accept="image/*" onchange="adicionarLogo(event)">
-        </div>
+        <button class="btn-template" onclick="aplicarTemplatePronto()">🚀 APLICAR TEMPLATE COMPLETO</button>
+        <p style="font-size: 10px; color: #666; text-align: center; margin: 0;">Injeta logo, efeitos, faixas e textos automaticamente.</p>
 
-        <button class="btn-acao" onclick="adicionarTextoTitulo()">+ Adicionar Título</button>
-        <button class="btn-acao" onclick="adicionarTextoSubtitulo()">+ Adicionar Subtítulo</button>
+        <hr style="width:100%; border:0; border-top:1px solid #eee;">
+        
+        <!-- Controles Manuais Extras -->
+        <button class="btn-acao" onclick="adicionarFaixaInclinada()">+ Adicionar Faixa Solta (Efeito)</button>
         <button class="btn-acao" onclick="deletarSelecionado()" style="background-color: #dc3545;">🗑️ Apagar Item Selecionado</button>
-
-        <button class="btn-gerar" onclick="baixarBanner()">⬇️ Baixar Banner (Alta Qualidade)</button>
+        <button class="btn-acao" onclick="baixarBanner()" style="background-color: #28a745;">⬇️ BAIXAR BANNER (JPG)</button>
     </div>
 
-    <!-- Área onde a mágica acontece -->
+    <!-- CANVAS -->
     <div class="area-canvas">
         <canvas id="meuCanvas"></canvas>
     </div>
 
     <script>
-        // Inicializa o Fabric.js
-        const canvas = new fabric.Canvas('meuCanvas', {
-            preserveObjectStacking: true // Impede que o item clicado pule sempre pra frente do fundo
-        });
-
-        // Configurações base
-        const corPadraoFundo = '#0b1325';
-        const corPadraoLaranja = '#ff5722';
+        const canvas = new fabric.Canvas('meuCanvas', { preserveObjectStacking: true });
         
-        // Formatos (Trabalhamos com metade do tamanho na tela para caber no monitor, 
-        // e na hora de exportar multiplicamos por 2 para ficar em Full HD)
         const tamanhos = {
-            feed: { w: 540, h: 540 },    // Exporta: 1080x1080
-            stories: { w: 540, h: 960 }  // Exporta: 1080x1920
+            feed: { w: 540, h: 540 },
+            stories: { w: 540, h: 960 }
         };
 
-        // Função para configurar o tamanho inicial
         function mudarFormato() {
             const formato = document.getElementById('sel-formato').value;
             canvas.setWidth(tamanhos[formato].w);
             canvas.setHeight(tamanhos[formato].h);
-            canvas.backgroundColor = document.getElementById('cor-fundo').value;
+            canvas.backgroundColor = '#0b1325';
             canvas.renderAll();
         }
 
-        // Mudar cor do fundo
-        function mudarCorFundo() {
-            canvas.backgroundColor = document.getElementById('cor-fundo').value;
-            canvas.renderAll();
+        // --- SISTEMA DE MEMÓRIA PARA A LOGO (LocalStorage) ---
+        function salvarLogoNaMemoria(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (f) {
+                const base64 = f.target.result;
+                localStorage.setItem('logoEmpresaBase64', base64); // Salva no navegador
+                alert("Logo salva com sucesso! Agora ela aparecerá automaticamente nos templates.");
+            };
+            reader.readAsDataURL(file);
         }
 
-        // Mudar cor do texto ou forma selecionada
-        function mudarCorElemento() {
-            const objAtivo = canvas.getActiveObject();
-            if (objAtivo) {
-                if (objAtivo.type === 'textbox') {
-                    objAtivo.set('fill', document.getElementById('cor-item').value);
-                }
-                canvas.renderAll();
+        function carregarLogoDaMemoria() {
+            const logoSalva = localStorage.getItem('logoEmpresaBase64');
+            if (logoSalva) {
+                fabric.Image.fromURL(logoSalva, function (img) {
+                    img.scaleToWidth(140);
+                    img.set({ left: 30, top: 40, selectable: true });
+                    canvas.add(img);
+                    canvas.renderAll();
+                });
             }
         }
 
-        // Adicionar Imagem de Fundo
+        // --- GERAÇÃO DE EFEITOS E FAIXAS ---
+        function adicionarFaixaInclinada(posicaoY = 600) {
+            // Cria um retângulo com efeito "skew" (inclinado) estilo o detalhe laranja
+            var faixa = new fabric.Rect({
+                left: -30, 
+                top: posicaoY, 
+                width: 350, 
+                height: 120, 
+                fill: '#ff5722', 
+                skewX: -20, // O segredo do recorte inclinado
+                selectable: true
+            });
+            canvas.add(faixa);
+            canvas.renderAll();
+        }
+
+        function aplicarTemplatePronto() {
+            // 1. Limpa textos e faixas anteriores (preserva o fundo)
+            const objetos = canvas.getObjects();
+            objetos.forEach(obj => { if (obj.type !== 'image') canvas.remove(obj); });
+
+            // 2. Carrega Logo
+            carregarLogoDaMemoria();
+
+            // 3. Adiciona Faixa Inclinada de Fundo para o Texto
+            adicionarFaixaInclinada(canvas.height - 250);
+
+            // 4. Injeta Textos Padrões
+            const titulo = new fabric.Textbox('TITULO DO PRODUTO', {
+                left: 30, top: canvas.height - 230, width: 450, fontSize: 40, 
+                fontFamily: 'Arial', fontWeight: '900', fill: '#ffffff', textAlign: 'left',
+                lineHeight: 1
+            });
+            
+            const subtitulo = new fabric.Textbox('Subtítulo ou descrição da peça aqui.', {
+                left: 30, top: canvas.height - 180, width: 400, fontSize: 18, 
+                fontFamily: 'Arial', fill: '#0b1325', fontWeight: 'bold' // Texto escuro em cima da faixa laranja
+            });
+
+            canvas.add(titulo, subtitulo);
+            
+            // Traz os textos para a frente da faixa
+            titulo.bringToFront();
+            subtitulo.bringToFront();
+            canvas.renderAll();
+        }
+
+        // --- FUNÇÕES BÁSICAS ---
         function adicionarImagemFundo(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function (f) {
-                const data = f.target.result;
-                fabric.Image.fromURL(data, function (img) {
-                    // Ajusta a imagem para caber na tela
-                    img.scaleToWidth(canvas.getWidth());
-                    // Joga a imagem lá pro fundo
+                fabric.Image.fromURL(f.target.result, function (img) {
+                    img.scaleToHeight(canvas.getHeight());
                     canvas.add(img);
-                    img.sendToBack();
+                    img.sendToBack(); // Garante que fique atrás de tudo
                     canvas.renderAll();
                 });
             };
             reader.readAsDataURL(file);
         }
 
-        // Adicionar Logo
-        function adicionarLogo(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (f) {
-                const data = f.target.result;
-                fabric.Image.fromURL(data, function (img) {
-                    img.scaleToWidth(150); // Tamanho inicial da logo
-                    img.set({ left: 30, top: 30 }); // Posição inicial
-                    canvas.add(img);
-                    canvas.setActiveObject(img);
-                    canvas.renderAll();
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Adicionar Texto Grande (Título)
-        function adicionarTextoTitulo() {
-            const texto = new fabric.Textbox('CLIQUE 2X PARA EDITAR', {
-                left: 30,
-                top: 250,
-                width: 400,
-                fontSize: 38,
-                fontFamily: 'Arial',
-                fontWeight: 'bold',
-                fill: '#ffffff', // Branco
-                textBackgroundColor: 'transparent',
-                textAlign: 'left',
-                lineHeight: 1.1
-            });
-            canvas.add(texto);
-            canvas.setActiveObject(texto);
-        }
-
-        // Adicionar Texto Menor (Subtítulo)
-        function adicionarTextoSubtitulo() {
-            const texto = new fabric.Textbox('Seu subtítulo aqui. Arraste para mover.', {
-                left: 30,
-                top: 350,
-                width: 350,
-                fontSize: 20,
-                fontFamily: 'Arial',
-                fill: corPadraoLaranja, // Laranja Marbe
-                textAlign: 'left'
-            });
-            canvas.add(texto);
-            canvas.setActiveObject(texto);
-        }
-
-        // Deletar item selecionado
         function deletarSelecionado() {
-            const objAtivo = canvas.getActiveObject();
-            if (objAtivo) {
-                canvas.remove(objAtivo);
-            }
+            const obj = canvas.getActiveObject();
+            if (obj) canvas.remove(obj);
         }
 
-        // Função de Exportar em Alta Qualidade
         function baixarBanner() {
-            // Remove a seleção visual (as bordas azuis de edição) antes de salvar
-            canvas.discardActiveObject();
-            canvas.renderAll();
-
-            // Multiplier 2 faz a imagem de 540x540 virar 1080x1080 (HD para Instagram)
-            const dataURL = canvas.toDataURL({
-                format: 'jpeg',
-                quality: 0.95,
-                multiplier: 2 
-            });
-
+            canvas.discardActiveObject(); canvas.renderAll();
             const link = document.createElement('a');
-            link.download = 'banner-rede-social.jpg';
-            link.href = dataURL;
+            link.download = 'banner-pronto.jpg';
+            link.href = canvas.toDataURL({ format: 'jpeg', quality: 0.95, multiplier: 2 });
             link.click();
         }
 
-        // Inicia com formato feed padrao e carrega a tela
-        window.onload = function() {
-            mudarFormato();
-            // Adiciona um título padrão pra não começar vazio
-            adicionarTextoTitulo();
-        };
-
-        // Permite apagar usando a tecla DELETE do teclado
-        window.addEventListener('keydown', function(e) {
-            if (e.key === 'Delete') {
-                deletarSelecionado();
-            }
-        });
+        window.onload = mudarFormato;
+        window.addEventListener('keydown', e => { if (e.key === 'Delete') deletarSelecionado(); });
     </script>
 </body>
 </html>
