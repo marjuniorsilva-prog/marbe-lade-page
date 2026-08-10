@@ -3,202 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Banner Padronizado</title>
-    <!-- Importando a biblioteca html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Gerador de Banner - Estilo Canva</title>
+    <!-- Importando a biblioteca Fabric.js (O "motor" do Canva) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #e9ecef;
             display: flex;
             gap: 20px;
             padding: 20px;
-        }
-
-        /* PAINEL DE CONTROLES */
-        .controles {
-            width: 300px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .controles label {
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .controles input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
+            margin: 0;
+            height: 100vh;
             box-sizing: border-box;
         }
 
+        /* PAINEL DE CONTROLES (Esquerda) */
+        .controles {
+            width: 320px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .controles h3 { margin-top: 0; color: #333; }
+        .controles label { font-weight: bold; font-size: 13px; color: #555; }
+        
+        .controles select, .controles input[type="file"] {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+
+        .linha-cores {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .btn-acao {
+            background-color: #0b1325; color: white; border: none; padding: 10px;
+            font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; text-align: center;
+        }
+        .btn-acao:hover { background-color: #1a2a4f; }
+
         .btn-gerar {
-            background-color: #ff5722; /* Laranja padrão */
-            color: white;
-            border: none;
-            padding: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: 0.3s;
+            background-color: #ff5722; color: white; border: none; padding: 12px;
+            font-weight: bold; font-size: 16px; cursor: pointer; border-radius: 4px; margin-top: 10px;
+        }
+        .btn-gerar:hover { background-color: #e64a19; }
+
+        /* ÁREA DE EDIÇÃO (Direita) */
+        .area-canvas {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            background-color: #d1d5db;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .btn-gerar:hover {
-            background-color: #e64a19;
+        /* Bordinha para mostrar onde o canvas acaba */
+        .canvas-container {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
-
-        /* ÁREA DO BANNER (O que será exportado) */
-        #banner-export {
-            width: 400px; /* Largura padrão (ex: Stories/Feed ajustável) */
-            height: 700px;
-            background-color: #0b1325; /* Azul escuro da identidade */
-            position: relative;
-            overflow: hidden;
-            color: white;
-        }
-
-        /* Imagem de Fundo (Produto) */
-        #bg-image {
-            position: absolute;
-            right: -50px;
-            bottom: 0;
-            width: 300px;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.8; /* Um pouco de transparência para não brigar com o texto */
-            z-index: 1;
-        }
-
-        /* Elementos Fixos de Identidade Visual */
-        .logo-fixa {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            font-weight: 900;
-            font-size: 24px;
-            z-index: 2;
-        }
-        .logo-fixa span { color: #ff5722; }
-
-        .detalhe-laranja {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 80px;
-            height: 150px;
-            background-color: #ff5722;
-            transform: skewX(-20deg);
-            z-index: 2;
-        }
-
-        /* Textos Dinâmicos */
-        .conteudo-texto {
-            position: absolute;
-            top: 250px;
-            left: 30px;
-            width: 70%;
-            z-index: 2;
-        }
-
-        #titulo-banner {
-            font-size: 38px;
-            font-weight: 900;
-            text-transform: uppercase;
-            line-height: 1.1;
-            margin: 0 0 15px 0;
-        }
-        #titulo-banner span { color: #ff5722; } /* Destaca uma palavra */
-
-        #subtitulo-banner {
-            font-size: 16px;
-            color: #d1d5db;
-            margin: 0;
-            border-left: 3px solid #ff5722;
-            padding-left: 10px;
+        
+        .instrucao {
+            font-size: 12px; color: #666; text-align: center; margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Painel de Formulário -->
+    <!-- Painel de Controles -->
     <div class="controles">
-        <h3>Controles do Banner</h3>
+        <h3>Painel de Edição</h3>
+        <p class="instrucao">Dê 2 cliques num texto na imagem para editá-lo. Clique e arraste para mover.</p>
         
         <div>
-            <label>Título Principal:</label>
-            <input type="text" id="input-titulo" value="PEÇAS TÉCNICAS EM PU" onkeyup="atualizarTexto()">
+            <label>Formato para Rede Social:</label>
+            <select id="sel-formato" onchange="mudarFormato()">
+                <option value="feed">Feed Instagram (Quadrado)</option>
+                <option value="stories">Stories Instagram (Vertical)</option>
+            </select>
+        </div>
+
+        <hr style="width:100%; border:0; border-top:1px solid #eee;">
+
+        <div class="linha-cores">
+            <label>Cor do Fundo:</label>
+            <input type="color" id="cor-fundo" value="#0b1325" onchange="mudarCorFundo()">
+        </div>
+
+        <div class="linha-cores">
+            <label>Cor do Item Selecionado:</label>
+            <input type="color" id="cor-item" value="#ffffff" onchange="mudarCorElemento()">
+        </div>
+
+        <hr style="width:100%; border:0; border-top:1px solid #eee;">
+
+        <div>
+            <label>1. Fundo (Foto do Produto):</label>
+            <input type="file" accept="image/*" onchange="adicionarImagemFundo(event)">
         </div>
 
         <div>
-            <label>Subtítulo:</label>
-            <input type="text" id="input-subtitulo" value="Soluções que otimizam seu desempenho." onkeyup="atualizarTexto()">
+            <label>2. Sua Logo (Com fundo transparente):</label>
+            <input type="file" accept="image/*" onchange="adicionarLogo(event)">
         </div>
 
-        <div>
-            <label>Foto do Produto:</label>
-            <input type="file" id="input-imagem" accept="image/*" onchange="atualizarImagem(event)">
-        </div>
+        <button class="btn-acao" onclick="adicionarTextoTitulo()">+ Adicionar Título</button>
+        <button class="btn-acao" onclick="adicionarTextoSubtitulo()">+ Adicionar Subtítulo</button>
+        <button class="btn-acao" onclick="deletarSelecionado()" style="background-color: #dc3545;">🗑️ Apagar Item Selecionado</button>
 
-        <button class="btn-gerar" onclick="baixarBanner()">Baixar Banner (JPG)</button>
+        <button class="btn-gerar" onclick="baixarBanner()">⬇️ Baixar Banner (Alta Qualidade)</button>
     </div>
 
-    <!-- Banner Preview -->
-    <div id="banner-export">
-        <!-- Foto dinâmica de fundo -->
-        <img id="bg-image" src="" alt="">
-        
-        <!-- Identidade Visual Fixa -->
-        <div class="logo-fixa">GRUPO<br><span>MARBE</span></div>
-        <div class="detalhe-laranja"></div>
-        
-        <!-- Textos Dinâmicos -->
-        <div class="conteudo-texto">
-            <h1 id="titulo-banner">PEÇAS TÉCNICAS EM PU</h1>
-            <p id="subtitulo-banner">Soluções que otimizam seu desempenho.</p>
-        </div>
+    <!-- Área onde a mágica acontece -->
+    <div class="area-canvas">
+        <canvas id="meuCanvas"></canvas>
     </div>
 
-    <!-- Lógica de Funcionamento -->
     <script>
-        // Função para atualizar os textos em tempo real
-        function atualizarTexto() {
-            document.getElementById('titulo-banner').innerText = document.getElementById('input-titulo').value;
-            document.getElementById('subtitulo-banner').innerText = document.getElementById('input-subtitulo').value;
+        // Inicializa o Fabric.js
+        const canvas = new fabric.Canvas('meuCanvas', {
+            preserveObjectStacking: true // Impede que o item clicado pule sempre pra frente do fundo
+        });
+
+        // Configurações base
+        const corPadraoFundo = '#0b1325';
+        const corPadraoLaranja = '#ff5722';
+        
+        // Formatos (Trabalhamos com metade do tamanho na tela para caber no monitor, 
+        // e na hora de exportar multiplicamos por 2 para ficar em Full HD)
+        const tamanhos = {
+            feed: { w: 540, h: 540 },    // Exporta: 1080x1080
+            stories: { w: 540, h: 960 }  // Exporta: 1080x1920
+        };
+
+        // Função para configurar o tamanho inicial
+        function mudarFormato() {
+            const formato = document.getElementById('sel-formato').value;
+            canvas.setWidth(tamanhos[formato].w);
+            canvas.setHeight(tamanhos[formato].h);
+            canvas.backgroundColor = document.getElementById('cor-fundo').value;
+            canvas.renderAll();
         }
 
-        // Função para carregar a imagem do computador para o banner
-        function atualizarImagem(event) {
-            const reader = new FileReader();
-            reader.onload = function(){
-                const output = document.getElementById('bg-image');
-                output.src = reader.result;
-            };
-            if(event.target.files[0]) {
-                reader.readAsDataURL(event.target.files[0]);
+        // Mudar cor do fundo
+        function mudarCorFundo() {
+            canvas.backgroundColor = document.getElementById('cor-fundo').value;
+            canvas.renderAll();
+        }
+
+        // Mudar cor do texto ou forma selecionada
+        function mudarCorElemento() {
+            const objAtivo = canvas.getActiveObject();
+            if (objAtivo) {
+                if (objAtivo.type === 'textbox') {
+                    objAtivo.set('fill', document.getElementById('cor-item').value);
+                }
+                canvas.renderAll();
             }
         }
 
-        // Função mágica que tira o print da div e baixa a imagem
-        function baixarBanner() {
-            const elementoBanner = document.getElementById('banner-export');
-            
-            // html2canvas renderiza a div como uma imagem (canvas)
-            html2canvas(elementoBanner, { scale: 2 }).then(canvas => {
-                // Cria um link temporário
-                let link = document.createElement('a');
-                link.download = 'banner-padrao.jpg'; // Nome do arquivo salvo
-                link.href = canvas.toDataURL('image/jpeg', 0.9); // Converte para JPG com 90% qualidade
-                link.click(); // Força o download
-            });
+        // Adicionar Imagem de Fundo
+        function adicionarImagemFundo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (f) {
+                const data = f.target.result;
+                fabric.Image.fromURL(data, function (img) {
+                    // Ajusta a imagem para caber na tela
+                    img.scaleToWidth(canvas.getWidth());
+                    // Joga a imagem lá pro fundo
+                    canvas.add(img);
+                    img.sendToBack();
+                    canvas.renderAll();
+                });
+            };
+            reader.readAsDataURL(file);
         }
+
+        // Adicionar Logo
+        function adicionarLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (f) {
+                const data = f.target.result;
+                fabric.Image.fromURL(data, function (img) {
+                    img.scaleToWidth(150); // Tamanho inicial da logo
+                    img.set({ left: 30, top: 30 }); // Posição inicial
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    canvas.renderAll();
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Adicionar Texto Grande (Título)
+        function adicionarTextoTitulo() {
+            const texto = new fabric.Textbox('CLIQUE 2X PARA EDITAR', {
+                left: 30,
+                top: 250,
+                width: 400,
+                fontSize: 38,
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                fill: '#ffffff', // Branco
+                textBackgroundColor: 'transparent',
+                textAlign: 'left',
+                lineHeight: 1.1
+            });
+            canvas.add(texto);
+            canvas.setActiveObject(texto);
+        }
+
+        // Adicionar Texto Menor (Subtítulo)
+        function adicionarTextoSubtitulo() {
+            const texto = new fabric.Textbox('Seu subtítulo aqui. Arraste para mover.', {
+                left: 30,
+                top: 350,
+                width: 350,
+                fontSize: 20,
+                fontFamily: 'Arial',
+                fill: corPadraoLaranja, // Laranja Marbe
+                textAlign: 'left'
+            });
+            canvas.add(texto);
+            canvas.setActiveObject(texto);
+        }
+
+        // Deletar item selecionado
+        function deletarSelecionado() {
+            const objAtivo = canvas.getActiveObject();
+            if (objAtivo) {
+                canvas.remove(objAtivo);
+            }
+        }
+
+        // Função de Exportar em Alta Qualidade
+        function baixarBanner() {
+            // Remove a seleção visual (as bordas azuis de edição) antes de salvar
+            canvas.discardActiveObject();
+            canvas.renderAll();
+
+            // Multiplier 2 faz a imagem de 540x540 virar 1080x1080 (HD para Instagram)
+            const dataURL = canvas.toDataURL({
+                format: 'jpeg',
+                quality: 0.95,
+                multiplier: 2 
+            });
+
+            const link = document.createElement('a');
+            link.download = 'banner-rede-social.jpg';
+            link.href = dataURL;
+            link.click();
+        }
+
+        // Inicia com formato feed padrao e carrega a tela
+        window.onload = function() {
+            mudarFormato();
+            // Adiciona um título padrão pra não começar vazio
+            adicionarTextoTitulo();
+        };
+
+        // Permite apagar usando a tecla DELETE do teclado
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Delete') {
+                deletarSelecionado();
+            }
+        });
     </script>
 </body>
 </html>
