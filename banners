@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Banner Padronizado</title>
+    <!-- Importando a biblioteca html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* PAINEL DE CONTROLES */
+        .controles {
+            width: 300px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .controles label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .controles input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-gerar {
+            background-color: #ff5722; /* Laranja padrão */
+            color: white;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .btn-gerar:hover {
+            background-color: #e64a19;
+        }
+
+        /* ÁREA DO BANNER (O que será exportado) */
+        #banner-export {
+            width: 400px; /* Largura padrão (ex: Stories/Feed ajustável) */
+            height: 700px;
+            background-color: #0b1325; /* Azul escuro da identidade */
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Imagem de Fundo (Produto) */
+        #bg-image {
+            position: absolute;
+            right: -50px;
+            bottom: 0;
+            width: 300px;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8; /* Um pouco de transparência para não brigar com o texto */
+            z-index: 1;
+        }
+
+        /* Elementos Fixos de Identidade Visual */
+        .logo-fixa {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-weight: 900;
+            font-size: 24px;
+            z-index: 2;
+        }
+        .logo-fixa span { color: #ff5722; }
+
+        .detalhe-laranja {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 80px;
+            height: 150px;
+            background-color: #ff5722;
+            transform: skewX(-20deg);
+            z-index: 2;
+        }
+
+        /* Textos Dinâmicos */
+        .conteudo-texto {
+            position: absolute;
+            top: 250px;
+            left: 30px;
+            width: 70%;
+            z-index: 2;
+        }
+
+        #titulo-banner {
+            font-size: 38px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin: 0 0 15px 0;
+        }
+        #titulo-banner span { color: #ff5722; } /* Destaca uma palavra */
+
+        #subtitulo-banner {
+            font-size: 16px;
+            color: #d1d5db;
+            margin: 0;
+            border-left: 3px solid #ff5722;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Painel de Formulário -->
+    <div class="controles">
+        <h3>Controles do Banner</h3>
+        
+        <div>
+            <label>Título Principal:</label>
+            <input type="text" id="input-titulo" value="PEÇAS TÉCNICAS EM PU" onkeyup="atualizarTexto()">
+        </div>
+
+        <div>
+            <label>Subtítulo:</label>
+            <input type="text" id="input-subtitulo" value="Soluções que otimizam seu desempenho." onkeyup="atualizarTexto()">
+        </div>
+
+        <div>
+            <label>Foto do Produto:</label>
+            <input type="file" id="input-imagem" accept="image/*" onchange="atualizarImagem(event)">
+        </div>
+
+        <button class="btn-gerar" onclick="baixarBanner()">Baixar Banner (JPG)</button>
+    </div>
+
+    <!-- Banner Preview -->
+    <div id="banner-export">
+        <!-- Foto dinâmica de fundo -->
+        <img id="bg-image" src="" alt="">
+        
+        <!-- Identidade Visual Fixa -->
+        <div class="logo-fixa">GRUPO<br><span>MARBE</span></div>
+        <div class="detalhe-laranja"></div>
+        
+        <!-- Textos Dinâmicos -->
+        <div class="conteudo-texto">
+            <h1 id="titulo-banner">PEÇAS TÉCNICAS EM PU</h1>
+            <p id="subtitulo-banner">Soluções que otimizam seu desempenho.</p>
+        </div>
+    </div>
+
+    <!-- Lógica de Funcionamento -->
+    <script>
+        // Função para atualizar os textos em tempo real
+        function atualizarTexto() {
+            document.getElementById('titulo-banner').innerText = document.getElementById('input-titulo').value;
+            document.getElementById('subtitulo-banner').innerText = document.getElementById('input-subtitulo').value;
+        }
+
+        // Função para carregar a imagem do computador para o banner
+        function atualizarImagem(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('bg-image');
+                output.src = reader.result;
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+
+        // Função mágica que tira o print da div e baixa a imagem
+        function baixarBanner() {
+            const elementoBanner = document.getElementById('banner-export');
+            
+            // html2canvas renderiza a div como uma imagem (canvas)
+            html2canvas(elementoBanner, { scale: 2 }).then(canvas => {
+                // Cria um link temporário
+                let link = document.createElement('a');
+                link.download = 'banner-padrao.jpg'; // Nome do arquivo salvo
+                link.href = canvas.toDataURL('image/jpeg', 0.9); // Converte para JPG com 90% qualidade
+                link.click(); // Força o download
+            });
+        }
+    </script>
+</body>
+</html>
+
