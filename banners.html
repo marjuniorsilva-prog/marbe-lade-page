@@ -1,101 +1,250 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Gerador Profissional Marbe</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <style>
-        body { font-family: sans-serif; background: #f0f0f0; display: flex; padding: 20px; gap: 20px; }
-        .painel { width: 350px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .area-canvas { flex-grow: 1; display: flex; justify-content: center; }
-        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; background: #0b1325; color: white; }
-        input { width: 100%; margin-bottom: 15px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banner Studio — Editor de Banners</title>
+<style>
+:root{--bg:#eef0f4;--panel:#fff;--line:#dfe3ea;--text:#172033;--muted:#687386;--accent:#2563eb;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:8px 12px;z-index:20}
+.brand{font-weight:800;font-size:17px;margin-right:10px;white-space:nowrap}.brand span{color:var(--accent)}
+.top .spacer{flex:1}.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 11px;font-size:13px}.btn:hover{background:#f6f8fb}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.danger{color:var(--danger)}.select{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:13px}
+.app{height:calc(100vh - 58px);display:grid;grid-template-columns:235px 1fr 285px;min-width:1050px}
+.left,.right{background:#fff;overflow:auto}.left{border-right:1px solid var(--line);padding:12px}.right{border-left:1px solid var(--line);padding:14px}.section-title{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:800;letter-spacing:.08em;margin:14px 5px 8px}
+.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:12px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;font-size:12px}.tool b{display:block;font-size:18px;margin-bottom:5px}.tool:hover{border-color:#b9c7e9;background:#f7f9ff}
+.template{border:1px solid var(--line);border-radius:10px;padding:7px;margin-bottom:8px;background:#fafbfc}.template canvas{width:100%;display:block;border-radius:6px;background:#eee}.template .trow{display:flex;justify-content:space-between;gap:5px;margin-top:6px}.template small{font-weight:700}
+.workspace{position:relative;display:flex;flex-direction:column;min-width:0}.workspacebar{height:45px;background:#f8f9fb;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:8px}.workspacebar span{font-size:12px;color:var(--muted)}
+.canvas-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:35px;background:#dfe2e8}
+.stage{position:relative;box-shadow:0 12px 35px #0002;background:#fff;user-select:none}.canvas{display:block}
+.overlay{position:absolute;border:2px solid var(--accent);box-shadow:0 0 0 1px #fff8;cursor:move}.handle{position:absolute;width:9px;height:9px;background:#fff;border:2px solid var(--accent);border-radius:2px}.nw{left:-6px;top:-6px;cursor:nwse-resize}.ne{right:-6px;top:-6px;cursor:nesw-resize}.sw{left:-6px;bottom:-6px;cursor:nesw-resize}.se{right:-6px;bottom:-6px;cursor:nwse-resize}.rot{left:50%;top:-29px;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:crosshair}
+.hidden{display:none!important}
+.prop-title{font-weight:800;font-size:14px;margin-bottom:12px}.empty{color:var(--muted);font-size:13px;line-height:1.5}
+.field{margin-bottom:11px}.field label{display:block;font-size:11px;font-weight:700;color:#596579;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:7px 8px;background:#fff}.field textarea{resize:vertical;min-height:60px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.colorrow{display:flex;gap:7px}.colorrow input[type=color]{width:42px;height:34px;padding:2px}.colorrow input[type=text]{flex:1}
+.mini{font-size:11px;color:var(--muted)}.check{display:flex;gap:7px;align-items:center;font-size:12px;margin:8px 0}.actions{display:flex;gap:6px;flex-wrap:wrap}.layer{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:7px;padding:7px;margin-bottom:5px;font-size:12px}.layer span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.layer button{border:0;background:none;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:100}.dialog{background:#fff;width:min(520px,92vw);max-height:85vh;overflow:auto;border-radius:15px;padding:18px;box-shadow:0 25px 70px #0005}.dialog h3{margin:0 0 14px}.template-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}.template-list .card{border:1px solid var(--line);padding:8px;border-radius:10px}.template-list canvas{width:100%;display:block}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#172033;color:#fff;padding:9px 14px;border-radius:8px;font-size:12px;z-index:200}
+@media(max-width:1100px){.app{grid-template-columns:210px 1fr 255px}.top .optional{display:none}}
+</style>
 </head>
 <body>
+<header class="top">
+  <div class="brand">Banner <span>Studio</span></div>
+  <button class="btn" id="newBtn">Novo</button>
+  <button class="btn" id="lastBtn">Último banner</button>
+  <button class="btn" id="duplicateBtn">Duplicar</button>
+  <button class="btn" id="undoBtn">↶</button><button class="btn" id="redoBtn">↷</button>
+  <div class="spacer"></div>
+  <select class="select" id="format">
+    <option value="1080x1350">Feed vertical — 1080×1350</option>
+    <option value="1080x1080">Feed quadrado — 1080×1080</option>
+    <option value="1080x1920">Story/Reels — 1080×1920</option>
+  </select>
+  <button class="btn" id="saveTemplateBtn">Salvar template</button>
+  <button class="btn primary" id="exportBtn">Exportar</button>
+</header>
 
-<div class="painel">
-    <h3>Configurações Iniciais</h3>
-    <label>1. Subir Logo (Salvará na memória):</label>
-    <input type="file" id="up-logo" onchange="salvarLogo(event)">
-    
-    <label>2. Subir Moldura (.PNG Transparente):</label>
-    <input type="file" id="up-moldura" onchange="carregarMoldura(event)">
+<div class="app">
+<aside class="left">
+  <div class="section-title">Adicionar</div>
+  <div class="toolgrid">
+    <button class="tool" data-add="image"><b>▧</b>Imagem</button>
+    <button class="tool" data-add="logo"><b>◇</b>Logo</button>
+    <button class="tool" data-add="title"><b>T</b>Título</button>
+    <button class="tool" data-add="text"><b>≡</b>Texto</button>
+    <button class="tool" data-add="rect"><b>□</b>Forma</button>
+    <button class="tool" data-add="frame"><b>▣</b>Moldura</button>
+  </div>
+  <div class="section-title">Projeto</div>
+  <div class="actions">
+    <button class="btn" id="bgBtn">Fundo</button>
+    <button class="btn" id="brandBtn">Identidade</button>
+    <button class="btn" id="uploadBtn">Upload</button>
+  </div>
+  <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="hidden">
+  <div class="section-title">Meus templates</div>
+  <div id="templates"></div>
+</aside>
 
-    <hr>
-    <h3>Operação Diária</h3>
-    <label>Foto do Produto:</label>
-    <input type="file" onchange="adicionarFoto(event)">
-    
-    <button onclick="adicionarTexto('ROLOS EM PU', 100, 400)">+ Adicionar Título</button>
-    <button onclick="baixarBanner()" style="background: #ff5722;">⬇️ BAIXAR BANNER FINAL</button>
+<main class="workspace">
+  <div class="workspacebar"><span id="canvasInfo">1080 × 1350 px</span><span>•</span><span>Arraste, redimensione e edite os elementos</span></div>
+  <div class="canvas-area" id="canvasArea">
+    <div class="stage" id="stage"><canvas id="canvas"></canvas></div>
+  </div>
+</main>
+
+<aside class="right">
+  <div id="properties">
+    <div class="prop-title">Propriedades</div>
+    <div class="empty">Selecione um elemento no banner para editar suas propriedades.</div>
+  </div>
+  <div class="section-title">Camadas</div>
+  <div id="layers"></div>
+</aside>
 </div>
 
-<div class="area-canvas">
-    <canvas id="canvas" width="540" height="960" style="border:1px solid #ccc"></canvas>
+<div id="modal" class="modal hidden">
+  <div class="dialog">
+    <h3 id="modalTitle">Escolha um template</h3>
+    <div id="modalBody"></div>
+    <div style="text-align:right;margin-top:14px"><button class="btn" id="closeModal">Fechar</button></div>
+  </div>
 </div>
 
 <script>
-    const canvas = new fabric.Canvas('canvas');
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const STORAGE='bannerStudio_v1';
+const BRAND='bannerStudio_brand_v1';
+const SIZES={ '1080x1350':[1080,1350], '1080x1080':[1080,1080], '1080x1920':[1080,1920] };
+let project, selected=null, history=[], future=[], activeFileTarget=null;
 
-    // 1. MEMÓRIA DA LOGO
-    function salvarLogo(e) {
-        const reader = new FileReader();
-        reader.onload = (f) => localStorage.setItem('logo', f.target.result);
-        reader.readAsDataURL(e.target.files[0]);
-    }
+function uid(){return 'e_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function defaultProject(format='1080x1350'){
+ const [w,h]=SIZES[format];
+ return {name:'Meu Banner',format,w,h,bg:'#ffffff',elements:[
+  {id:uid(),type:'rect',name:'Faixa decorativa',x:0,y:h*.82,w:w,h:h*.18,fill:'#172033',opacity:1,rotation:0,rx:0,locked:false,visible:true},
+  {id:uid(),type:'frame',name:'Imagem principal',x:w*.08,y:h*.13,w:w*.84,h:h*.56,fill:'#e9edf2',stroke:'#2563eb',strokeWidth:5,rx:28,rotation:0,locked:false,visible:true},
+  {id:uid(),type:'text',name:'Título',text:'TÍTULO DO BANNER',x:w*.08,y:h*.73,w:w*.84,h:70,font:'Arial',size:58,weight:800,fill:'#ffffff',align:'left',line:1.1,letter:0,opacity:1,rotation:0,locked:false,visible:true},
+  {id:uid(),type:'text',name:'Subtítulo',text:'Seu texto aqui',x:w*.08,y:h*.88,w:w*.84,h:45,font:'Arial',size:28,weight:500,fill:'#dce4f2',align:'left',line:1.2,letter:0,opacity:1,rotation:0,locked:false,visible:true}
+ ],selected:null};
+}
+function saveLocal(){localStorage.setItem(STORAGE,JSON.stringify(project))}
+function snapshot(){history.push(clone(project));if(history.length>50)history.shift();future=[]}
+function undo(){if(!history.length)return;future.push(clone(project));project=history.pop();selected=null;render()}
+function redo(){if(!future.length)return;history.push(clone(project));project=future.pop();selected=null;render()}
+function getEl(id){return project.elements.find(e=>e.id===id)}
+function cssScale(){return $('#canvas').width/project.w}
+function render(){
+ $('#format').value=project.format;
+ $('#canvasInfo').textContent=project.w+' × '+project.h+' px';
+ const canvas=$('#canvas'), stage=$('#stage');
+ const area=$('#canvasArea'); const maxW=Math.max(360,area.clientWidth-90), maxH=Math.max(360,area.clientHeight-90);
+ const scale=Math.min(maxW/project.w,maxH/project.h,1);
+ canvas.width=project.w;canvas.height=project.h;canvas.style.width=(project.w*scale)+'px';canvas.style.height=(project.h*scale)+'px';
+ stage.style.width=canvas.style.width;stage.style.height=canvas.style.height;
+ const ctx=canvas.getContext('2d');ctx.clearRect(0,0,project.w,project.h);ctx.fillStyle=project.bg;ctx.fillRect(0,0,project.w,project.h);
+ [...project.elements].forEach(e=>drawElement(ctx,e));
+ renderOverlay();renderProperties();renderLayers();renderTemplates();saveLocal();
+}
+function drawElement(ctx,e){
+ if(e.visible===false)return;
+ ctx.save();ctx.globalAlpha=e.opacity??1;
+ ctx.translate(e.x+e.w/2,e.y+e.h/2);ctx.rotate((e.rotation||0)*Math.PI/180);
+ const x=-e.w/2,y=-e.h/2;
+ if(e.type==='rect'){ctx.fillStyle=e.fill||'#000';roundRect(ctx,x,y,e.w,e.h,e.rx||0);ctx.fill();if(e.stroke){ctx.strokeStyle=e.stroke;ctx.lineWidth=e.strokeWidth||2;ctx.stroke()}}
+ if(e.type==='frame'){ctx.fillStyle=e.fill||'#eee';roundRect(ctx,x,y,e.w,e.h,e.rx||0);ctx.fill();if(e.stroke){ctx.strokeStyle=e.stroke;ctx.lineWidth=e.strokeWidth||2;ctx.stroke()}}
+ if((e.type==='image'||e.type==='logo')&&e.src){const img=new Image();img.onload=()=>{drawImageCover(ctx,img,x,y,e.w,e.h,e.zoom||1,e.fit||'cover');if(selected===e.id)renderOverlay()};img.src=e.src}
+ if(e.type==='text'){ctx.fillStyle=e.fill||'#000';ctx.font=`${e.weight||400} ${e.size||40}px ${e.font||'Arial'}`;ctx.textAlign=e.align||'left';ctx.textBaseline='top';wrapText(ctx,e.text||'',e.align==='center'?0:e.align==='right'?e.w:x,e.w,e.h,e.line||1.15,e.letter||0,e.align||'left')}
+ ctx.restore();
+}
+function roundRect(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function drawImageCover(ctx,img,x,y,w,h,zoom=1,fit='cover'){
+ const iw=img.naturalWidth,ih=img.naturalHeight;let scale=fit==='contain'?Math.min(w/iw,h/ih):Math.max(w/iw,h/ih);scale*=zoom;
+ const dw=iw*scale,dh=ih*scale;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);ctx.restore()
+}
+function wrapText(ctx,text,x,w,h,lineHeight,letter,align){
+ const lines=[];text.split('\\n').forEach(par=>{let line='';for(const word of par.split(' ')){const test=line?line+' '+word:word;if(ctx.measureText(test).width>w && line){lines.push(line);line=word}else line=test}lines.push(line)});
+ const lh=(parseFloat(ctx.font)||40)*lineHeight;lines.slice(0,Math.floor(h/lh)||1).forEach((l,i)=>ctx.fillText(l,x,i*lh+2))}
+function renderOverlay(){
+ const old=$('.overlay');if(old)old.remove();if(!selected)return;const e=getEl(selected);if(!e||e.visible===false)return;
+ const scale=cssScale(),o=document.createElement('div');o.className='overlay';o.dataset.id=e.id;
+ Object.assign(o.style,{left:e.x*scale+'px',top:e.y*scale+'px',width:e.w*scale+'px',height:e.h*scale+'px',transform:`rotate(${e.rotation||0}deg)`,transformOrigin:'center'});
+ ['nw','ne','sw','se'].forEach(c=>{const h=document.createElement('i');h.className='handle '+c;o.appendChild(h);});
+ const r=document.createElement('i');r.className='handle rot';o.appendChild(r);$('#stage').appendChild(o);
+}
+function renderProperties(){
+ const box=$('#properties');if(!selected){box.innerHTML='<div class="prop-title">Propriedades</div><div class="empty">Selecione um elemento no banner para editar suas propriedades.</div>';return}
+ const e=getEl(selected);if(!e)return;
+ let h=`<div class="prop-title">${escapeHtml(e.name||e.type)}</div>`;
+ h+=`<div class="field"><label>Nome</label><input id="pName" value="${escapeAttr(e.name||'')}"></div>`;
+ if(e.type==='text')h+=`<div class="field"><label>Texto</label><textarea id="pText">${escapeHtml(e.text||'')}</textarea></div>
+ <div class="two"><div class="field"><label>Fonte</label><select id="pFont">${['Arial','Georgia','Verdana','Trebuchet MS','Impact','Courier New'].map(f=>`<option ${e.font===f?'selected':''}>${f}</option>`).join('')}</select></div><div class="field"><label>Tamanho</label><input id="pSize" type="number" value="${e.size||40}"></div></div>
+ <div class="two"><div class="field"><label>Peso</label><select id="pWeight"><option value="400" ${e.weight==400?'selected':''}>Normal</option><option value="600" ${e.weight==600?'selected':''}>Semibold</option><option value="800" ${e.weight==800?'selected':''}>Negrito</option></select></div><div class="field"><label>Alinhamento</label><select id="pAlign"><option ${e.align==='left'?'selected':''}>left</option><option ${e.align==='center'?'selected':''}>center</option><option ${e.align==='right'?'selected':''}>right</option></select></div></div>`;
+ h+=`<div class="field"><label>Cor</label><div class="colorrow"><input id="pColor" type="color" value="${e.fill||'#000000'}"><input id="pColorText" value="${e.fill||'#000000'}"></div></div>`;
+ if(e.type==='image'||e.type==='logo')h+=`<div class="field"><label>Ajuste</label><select id="pFit"><option value="cover" ${e.fit!=='contain'?'selected':''}>Preencher</option><option value="contain" ${e.fit==='contain'?'selected':''}>Conter</option></select></div><div class="field"><label>Zoom</label><input id="pZoom" type="range" min=".5" max="3" step=".01" value="${e.zoom||1}"></div>`;
+ if(e.type==='rect'||e.type==='frame')h+=`<div class="field"><label>Preenchimento</label><div class="colorrow"><input id="pFill" type="color" value="${e.fill||'#ffffff'}"><input id="pFillText" value="${e.fill||'#ffffff'}"></div></div><div class="field"><label>Borda</label><div class="colorrow"><input id="pStroke" type="color" value="${e.stroke||'#000000'}"><input id="pStrokeText" value="${e.stroke||'#000000'}"></div></div><div class="two"><div class="field"><label>Espessura</label><input id="pStrokeW" type="number" value="${e.strokeWidth||0}"></div><div class="field"><label>Cantos</label><input id="pRx" type="number" value="${e.rx||0}"></div></div>`;
+ h+=`<div class="two"><div class="field"><label>X</label><input id="pX" type="number" value="${Math.round(e.x)}"></div><div class="field"><label>Y</label><input id="pY" type="number" value="${Math.round(e.y)}"></div></div>
+ <div class="two"><div class="field"><label>Largura</label><input id="pW" type="number" value="${Math.round(e.w)}"></div><div class="field"><label>Altura</label><input id="pH" type="number" value="${Math.round(e.h)}"></div></div>
+ <div class="field"><label>Rotação</label><input id="pRot" type="number" value="${Math.round(e.rotation||0)}"></div>
+ <label class="check"><input id="pVisible" type="checkbox" ${e.visible!==false?'checked':''}> Visível</label>
+ <label class="check"><input id="pLocked" type="checkbox" ${e.locked?'checked':''}> Bloquear</label>
+ <div class="actions"><button class="btn" id="bringFront">Trazer para frente</button><button class="btn" id="sendBack">Enviar para trás</button><button class="btn danger" id="deleteEl">Excluir</button></div>`;
+ box.innerHTML=h;bindProperties(e)
+}
+function bindProperties(e){
+ const set=(sel,key,parse=v=>v)=>{const el=$(sel);if(el)el.addEventListener('input',()=>{snapshot();e[key]=parse(el.value);render()})};
+ set('#pName','name');set('#pText','text');set('#pFont','font');set('#pSize','size',Number);set('#pWeight','weight',Number);set('#pAlign','align');
+ set('#pColor','fill');set('#pColorText','fill');set('#pFit','fit');set('#pZoom','zoom',Number);set('#pFill','fill');set('#pFillText','fill');set('#pStroke','stroke');set('#pStrokeText','stroke');set('#pStrokeW','strokeWidth',Number);set('#pRx','rx',Number);
+ set('#pX','x',Number);set('#pY','y',Number);set('#pW','w',Number);set('#pH','h',Number);set('#pRot','rotation',Number);
+ ['pVisible','pLocked'].forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('change',()=>{snapshot();e[id==='pVisible'?'visible':'locked']=el.checked;render()})});
+ $('#deleteEl').onclick=()=>{snapshot();project.elements=project.elements.filter(x=>x.id!==e.id);selected=null;render()};
+ $('#bringFront').onclick=()=>{snapshot();project.elements=project.elements.filter(x=>x.id!==e.id);project.elements.push(e);render()};
+ $('#sendBack').onclick=()=>{snapshot();project.elements=project.elements.filter(x=>x.id!==e.id);project.elements.unshift(e);render()};
+}
+function renderLayers(){
+ const box=$('#layers');box.innerHTML='';
+ [...project.elements].reverse().forEach(e=>{const d=document.createElement('div');d.className='layer';d.innerHTML=`<span>${escapeHtml(e.name||e.type)}</span><button title="visibilidade">${e.visible===false?'○':'●'}</button><button title="bloquear">${e.locked?'🔒':'🔓'}</button>`;d.onclick=ev=>{if(ev.target.tagName==='BUTTON')return;selected=e.id;render()};d.querySelectorAll('button')[0].onclick=()=>{snapshot();e.visible=e.visible===false;render()};d.querySelectorAll('button')[1].onclick=()=>{snapshot();e.locked=!e.locked;render()};box.appendChild(d)})
+}
+function renderTemplates(){
+ const box=$('#templates');box.innerHTML='';getTemplates().forEach((t,i)=>{const d=document.createElement('div');d.className='template';const c=document.createElement('canvas');c.width=t.w;c.height=t.h;c.style.aspectRatio=t.w+'/'+t.h;d.appendChild(c);const ctx=c.getContext('2d');ctx.fillStyle=t.bg;ctx.fillRect(0,0,t.w,t.h);t.elements.forEach(e=>drawElement(ctx,e));const row=document.createElement('div');row.className='trow';row.innerHTML=`<small>${escapeHtml(t.name||'Template')}</small><button class="btn" style="padding:4px 7px">Usar</button>`;row.querySelector('button').onclick=()=>useTemplate(t);d.appendChild(row);box.appendChild(d)})}
+function getTemplates(){try{return JSON.parse(localStorage.getItem('bannerStudio_templates')||'[]')}catch{return[]}}
+function saveTemplate(){
+ const list=getTemplates();const t=clone(project);t.name=prompt('Nome do template:',project.name||'Meu template')||'Meu template';t.elements=t.elements.map(e=>{if(e.type==='image'||e.type==='logo')return {...e,src:null};return e});list.unshift(t);localStorage.setItem('bannerStudio_templates',JSON.stringify(list.slice(0,30)));toast('Template salvo');renderTemplates()
+}
+function useTemplate(t){
+ snapshot();project=clone(t);project.name='Novo banner';selected=null;const img=project.elements.find(e=>e.type==='image');if(img)img.src=null;render();toast('Template aplicado. Adicione uma nova imagem.')
+}
+function newProject(){snapshot();project=defaultProject($('#format').value);selected=null;render()}
+function duplicate(){snapshot();project.name=project.name+' — cópia';project.elements=project.elements.map(e=>({...e,id:uid()}));selected=null;render();toast('Banner duplicado')}
+function addElement(type){
+ snapshot();const [w,h]=SIZES[project.format];let e={id:uid(),type,name:'Elemento',x:w*.15,y:h*.15,w:w*.7,h:h*.2,opacity:1,rotation:0,locked:false,visible:true};
+ if(type==='title')Object.assign(e,{type:'text',name:'Título',text:'NOVO TÍTULO',size:64,weight:800,font:'Arial',fill:'#172033',align:'left',line:1.1});
+ if(type==='text')Object.assign(e,{type:'text',name:'Texto',text:'Digite seu texto',size:34,weight:400,font:'Arial',fill:'#172033',align:'left',line:1.2});
+ if(type==='rect')Object.assign(e,{name:'Forma',fill:'#2563eb',rx:20});
+ if(type==='frame')Object.assign(e,{name:'Moldura',fill:'#edf0f4',stroke:'#2563eb',strokeWidth:5,rx:25});
+ if(type==='image'||type==='logo'){Object.assign(e,{name:type==='logo'?'Logo':'Imagem principal',w:w*.7,h:h*.4,src:null,fit:'cover',zoom:1});if(type==='logo')e.w=e.h=Math.min(w*.22,h*.14)}
+ project.elements.push(e);selected=e.id;render();if(type==='image'||type==='logo')chooseFile(type)
+}
+function chooseFile(target){activeFileTarget=target;$('#fileInput').value='';$('#fileInput').click()}
+$('#fileInput').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{let e;if(selected&&['image','logo'].includes(getEl(selected)?.type))e=getEl(selected);else {addElement(activeFileTarget);e=getEl(selected)};snapshot();e.src=reader.result;e.type=activeFileTarget;render();toast('Imagem adicionada')};reader.readAsDataURL(f)}
+function upload(){activeFileTarget='image';chooseFile('image')}
+function setBackground(){const c=prompt('Cor do fundo (hex):',project.bg);if(c){snapshot();project.bg=c;render()}}
+function brand(){
+ const b=JSON.parse(localStorage.getItem(BRAND)||'{}');const name=prompt('Nome da identidade visual:',b.name||'Minha marca');if(!name)return;const color=prompt('Cor principal:',b.color||'#2563eb');localStorage.setItem(BRAND,JSON.stringify({name,color}));toast('Identidade salva')}
+function exportImage(){
+ const type=prompt('Formato de exportação: PNG, JPG ou WEBP','PNG')?.toLowerCase();if(!['png','jpg','webp'].includes(type))return;
+ const c=document.createElement('canvas');c.width=project.w;c.height=project.h;const ctx=c.getContext('2d');ctx.fillStyle=project.bg;ctx.fillRect(0,0,c.width,c.height);project.elements.forEach(e=>drawElement(ctx,e));
+ setTimeout(()=>{const mime=type==='jpg'?'image/jpeg':`image/${type}`;const a=document.createElement('a');a.download=(project.name||'banner').replace(/[^a-z0-9áéíóúãõç _-]/gi,'_')+'.'+type;a.href=c.toDataURL(mime,.95);a.click();toast('Exportação concluída')},350)
+}
+function lastBanner(){try{const x=JSON.parse(localStorage.getItem(STORAGE));if(x){project=clone(x);selected=null;render();toast('Último banner carregado')}}catch{}}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function escapeAttr(s){return escapeHtml(s)}
+function pointerPos(ev){const r=$('#canvas').getBoundingClientRect();return{x:(ev.clientX-r.left)/cssScale(),y:(ev.clientY-r.top)/cssScale()}}
+let drag=null;
+$('#stage').addEventListener('pointerdown',ev=>{
+ const o=ev.target.closest('.overlay');if(!o)return;const id=o.dataset.id,e=getEl(id);if(!e||e.locked)return;selected=id;const p=pointerPos(ev);const cls=ev.target.className;let mode=cls.includes('handle')?(cls.includes('rot')?'rotate':'resize'):'move';snapshot();drag={mode,start:p,ex:e.x,ey:e.y,ew:e.w,eh:e.h,er:e.rotation||0};ev.target.setPointerCapture?.(ev.pointerId);render()
+});
+window.addEventListener('pointermove',ev=>{
+ if(!drag||!selected)return;const e=getEl(selected),p=pointerPos(ev),dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+ if(drag.mode==='move'){e.x=drag.ex+dx;e.y=drag.ey+dy}
+ else if(drag.mode==='resize'){e.w=Math.max(20,drag.ew+dx);e.h=Math.max(20,drag.eh+dy)}
+ else {e.rotation=drag.er+Math.atan2(p.y-(e.y+e.h/2),p.x-(e.x+e.w/2))*180/Math.PI}
+ render()
+});
+window.addEventListener('pointerup',()=>{drag=null});
+$('#canvas').addEventListener('dblclick',ev=>{if(!selected)return;const e=getEl(selected);if(e?.type==='text'){const t=prompt('Editar texto:',e.text);if(t!==null){snapshot();e.text=t;render()}}});
+$('#canvasArea').addEventListener('click',ev=>{if(ev.target===$('#canvas')){selected=null;render()}});
+$('#format').onchange=()=>{snapshot();const [w,h]=SIZES[$('#format').value];project.format=$('#format').value;project.w=w;project.h=h;render()};
+$$('[data-add]').forEach(b=>b.onclick=()=>addElement(b.dataset.add));
+$('#uploadBtn').onclick=upload;$('#bgBtn').onclick=setBackground;$('#brandBtn').onclick=brand;$('#newBtn').onclick=newProject;$('#duplicateBtn').onclick=duplicate;$('#lastBtn').onclick=lastBanner;$('#undoBtn').onclick=undo;$('#redoBtn').onclick=redo;$('#saveTemplateBtn').onclick=saveTemplate;$('#exportBtn').onclick=exportImage;
+$('#closeModal').onclick=()=>$('#modal').classList.add('hidden');
+window.addEventListener('keydown',ev=>{if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'){ev.preventDefault();undo()}if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='y'){ev.preventDefault();redo()}if(ev.key==='Delete'&&selected&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){snapshot();project.elements=project.elements.filter(e=>e.id!==selected);selected=null;render()}});
+window.addEventListener('resize',()=>render());
 
-    // 2. CARREGAR MOLDURA (A arte com curvas e faixas)
-    function carregarMoldura(e) {
-        const reader = new FileReader();
-        reader.onload = (f) => {
-            fabric.Image.fromURL(f.target.result, (img) => {
-                img.set({ selectable: false, evented: false });
-                canvas.add(img);
-                img.sendToFront(); // Moldura sempre por cima
-                adicionarLogoPadrao();
-            });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-    function adicionarLogoPadrao() {
-        const logo = localStorage.getItem('logo');
-        if (logo) {
-            fabric.Image.fromURL(logo, (img) => {
-                img.scaleToWidth(120);
-                img.set({ left: 30, top: 30 });
-                canvas.add(img);
-            });
-        }
-    }
-
-    // 3. FOTO DO PRODUTO (Fica atrás da moldura)
-    function adicionarFoto(e) {
-        const reader = new FileReader();
-        reader.onload = (f) => {
-            fabric.Image.fromURL(f.target.result, (img) => {
-                img.scaleToWidth(canvas.getWidth());
-                canvas.add(img);
-                img.sendToBack(); // Foto sempre no fundo
-            });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-    // 4. TEXTOS
-    function adicionarTexto(txt, left, top) {
-        const text = new fabric.Textbox(txt, { left, top, fontSize: 40, fontWeight: '900', fill: '#0b1325' });
-        canvas.add(text);
-    }
-
-    // 5. EXPORTAR
-    function baixarBanner() {
-        const link = document.createElement('a');
-        link.download = 'banner-marbe.jpg';
-        link.href = canvas.toDataURL({ format: 'jpeg', quality: 1.0, multiplier: 2 });
-        link.click();
-    }
+(function init(){let saved;try{saved=JSON.parse(localStorage.getItem(STORAGE))}catch{}project=saved||defaultProject();render()})();
 </script>
 </body>
 </html>
